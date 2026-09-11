@@ -13,14 +13,16 @@ function rowToLead(row) {
     address: row[3] || "",
     phone: row[4] || "",
     website: row[5] || "",
-    type: row[6] || "",
-    status: row[7] || "Not Called",
-    notes: row[8] || "",
-    followUpDate: row[9] || "",
-    priority: row[10] === "TRUE",
-    callCount: parseInt(row[11] || "0", 10),
-    shared: row[12] === "TRUE",
-    addedDate: row[13] || "",
+    city: row[6] || "",
+    type: row[7] || "",
+    status: row[8] || "Not Called",
+    notes: row[9] || "",
+    followUpDate: row[10] || "",
+    priority: row[11] === "TRUE",
+    callCount: parseInt(row[12] || "0", 10),
+    shared: row[13] === "TRUE",
+    addedDate: row[14] || "",
+    possibleDuplicate: row[15] === "TRUE",
   };
 }
 
@@ -39,7 +41,7 @@ module.exports = async (req, res) => {
   const tabName = tabNameForUser(decoded.email);
   let rows;
   try {
-    rows = await getAllRows(tabName, "N");
+    rows = await getAllRows(tabName, "P");
   } catch (e) {
     // Tab doesn't exist yet (no searches run) — just means an empty list.
     return res.status(200).json({ leads: [] });
