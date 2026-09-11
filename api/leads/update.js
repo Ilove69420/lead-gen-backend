@@ -47,20 +47,20 @@ module.exports = async (req, res) => {
   const current = rows[rowNumber - 2]; // convert back to 0-indexed array position
 
   const updated = [...current];
-  // indices per HEADERS: 7 Status, 8 Notes, 9 Follow-up Date, 10 Priority, 11 Call Count
+  // indices per HEADERS: 8 Status, 9 Notes, 10 Follow-up Date, 11 Priority, 12 Call Count
   if (status !== undefined) {
-    updated[7] = status;
+    updated[8] = status;
     if (status === "Called") {
-      const currentCount = parseInt(current[11] || "0", 10);
-      updated[11] = String(currentCount + 1);
+      const currentCount = parseInt(current[12] || "0", 10);
+      updated[12] = String(currentCount + 1);
     }
   }
-  if (notes !== undefined) updated[8] = notes;
-  if (followUpDate !== undefined) updated[9] = followUpDate;
-  if (priority !== undefined) updated[10] = priority ? "TRUE" : "FALSE";
+  if (notes !== undefined) updated[9] = notes;
+  if (followUpDate !== undefined) updated[10] = followUpDate;
+  if (priority !== undefined) updated[11] = priority ? "TRUE" : "FALSE";
 
-  // pad to 14 columns in case the row was short
-  while (updated.length < 14) updated.push("");
+  // pad to 16 columns in case the row was short
+  while (updated.length < 16) updated.push("");
 
   await updateRow(tabName, rowNumber, updated);
 
