@@ -48,21 +48,28 @@ module.exports = async (req, res) => {
     const isDuplicate = existingKeys.has(key);
     const leadId = uuidv4();
 
+    // FIX: this column classifies the lead by whether it has a website —
+    // that's the entire point of "Type" (No Website / Has Website), not
+    // the business category (that's preserved in the Batch ID instead).
+    const websiteType = lead.website ? "Has Website" : "No Website";
+
     rowsToInsert.push([
-      leadId,
-      batchId,
-      lead.name || "",
-      lead.address || "",
-      lead.phone || "",
-      lead.website || "",
-      businessType,
-      "Not Called",
-      "",
-      "",
-      "FALSE",
-      "0",
-      "FALSE",
-      addedDate,
+      leadId,                       // A: Lead ID
+      batchId,                      // B: Batch ID
+      lead.name || "",              // C: Business
+      lead.address || "",           // D: Address
+      lead.phone || "",             // E: Phone
+      lead.website || "",           // F: Website
+      city,                         // G: City (stored directly — no more parsing from Batch ID)
+      websiteType,                  // H: Type — FIXED
+      "Not Called",                 // I: Status
+      "",                           // J: Notes
+      "",                           // K: Follow-up Date
+      "FALSE",                      // L: Priority
+      "0",                          // M: Call Count
+      "FALSE",                      // N: Shared
+      addedDate,                    // O: Added Date
+      isDuplicate ? "TRUE" : "FALSE", // P: Possible Duplicate — now persisted, not just returned once
     ]);
 
     results.push({
