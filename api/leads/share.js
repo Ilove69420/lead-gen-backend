@@ -40,26 +40,26 @@ module.exports = async (req, res) => {
   const rows = await getAllRows(tabName);
   const leadRow = rows[rowNumber - 2];
 
-  // Main Sheet columns (per original roadmap): Business, City, Type, Added By, Date Shared, Notes
-  // We pull City out of the Batch ID prefix, since that's where it's encoded.
-  const batchId = leadRow[1] || "";
-  const city = batchId.split("-")[0] || "";
+  // Main Sheet columns (per original roadmap): Business, City, Type, Added By, Date Shared, Notes, Lead ID
+  // FIX: City now comes straight from its own column (G) instead of being
+  // parsed out of the Batch ID — no more ambiguity if a city name has a hyphen.
+  const city = leadRow[6] || "";
 
   await ensureTabExists(MAIN_SHEET_TAB); // safe no-op if it already exists
   await appendRows(MAIN_SHEET_TAB, [[
     leadRow[2] || "",           // Business
-    city,                        // City
-    leadRow[6] || "",           // Type
+    city,                        // City — FIXED
+    leadRow[7] || "",           // Type
     decoded.email,               // Added By
     new Date().toISOString(),    // Date Shared
-    leadRow[8] || "",            // Notes
+    leadRow[9] || "",            // Notes
     leadId,                      // Lead ID (hidden helper column, for admin delete)
   ]]);
 
-  // mark Shared = TRUE in the owner's own tab (column M / index 12)
+  // mark Shared = TRUE in the owner's own tab (column N / index 13)
   const updated = [...leadRow];
-  while (updated.length < 14) updated.push("");
-  updated[12] = "TRUE";
+  while (updated.length < 16) updated.push("");
+  updated[13] = "TRUE";
   await updateRow(tabName, rowNumber, updated);
 
   return res.status(200).json({ leadId, sharedToMainSheet: true });
